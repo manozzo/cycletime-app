@@ -9313,14 +9313,21 @@ var define;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.saveToLocalStorage = saveToLocalStorage;
+exports.pushNewTime = pushNewTime;
 exports.formatTime = formatTime;
-exports.timerContainer = void 0;
+exports.renderStatsDisplay = renderStatsDisplay;
+exports.Time = exports.timesArray = exports.timerContainer = void 0;
+
+var _moment = _interopRequireDefault(require("moment"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Stopwatch = require("statman-stopwatch");
 
-var stopwatch = new Stopwatch();
-
-var moment = require("moment");
+var stopwatch = new Stopwatch(); // var moment = require("moment");
 
 var momentDurationFormatSetup = require("moment-duration-format");
 
@@ -9331,46 +9338,99 @@ var timerInterval; // query selectors for timer
 var timerDisplay = document.querySelector("[data-timer-display]");
 var timerContainer = document.querySelector("[data-timer-container]");
 exports.timerContainer = timerContainer;
-var statsDisplay = document.querySelector("[stats-timer-display]"); // function to format time into readable format
+var statsDisplay = document.querySelector("[stats-timer-display]");
+var stopButton = document.getElementsByClassName("stop");
+var resetButton = document.getElementsByClassName("reset"); // query selector for stats
+
+var samplesStats = document.querySelector("[data-samples]");
+var minStats = document.querySelector("[data-min]");
+var meanStats = document.querySelector("[data-mean]");
+var maxStats = document.querySelector("[data-max]");
+var medianStats = document.querySelector("[data-median]");
+var modeStats = document.querySelector("[data-mode]");
+var totalStats = document.querySelector("[data-total]");
+var cycleperhourStats = document.querySelector("[data-cyclesperhour]"); // function to save to local storage
+
+function saveToLocalStorage() {
+  localStorage.setItem(LOCAL_STORAGE_LIST_KEY, JSON.stringify(timesArray));
+} // array of time objects and local storage key
+
+
+var LOCAL_STORAGE_LIST_KEY = "saved.times";
+var timesArray = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || []; //function to push new time to times array
+
+exports.timesArray = timesArray;
+
+function pushNewTime(recordedTime) {
+  timesArray.unshift(new Time(recordedTime));
+}
 
 function formatTime(time) {
-  return moment.duration(time, "milliseconds").format("ss.SS", {
+  return _moment.default.duration(time, "milliseconds").format("ss.SS", {
     trim: false
   });
-}
+} //class to create time objects
+
+
+var Time = function Time(recordedTime) {
+  _classCallCheck(this, Time);
+
+  this.recordedTime = recordedTime;
+  this.id = Date.now() + Math.random();
+  this.formattedTime = formatTime(this.recordedTime);
+  this.date = (0, _moment.default)();
+};
+
+exports.Time = Time;
 
 function startStopwatch() {
   stopwatch.start();
   stopwatchRunning = true;
   timerInterval = setInterval(function () {
-    time = stopwatch.read(); // update timer display with formatted time;
-
+    time = stopwatch.read();
     timerDisplay.textContent = formatTime(time);
   }, 1);
 }
 
 function stopStopwatch() {
-  //stop the stop watch and update stopwatchRunning to false
   stopwatch.stop();
   stopwatchRunning = false;
-  clearInterval(timerInterval); // read the time from the stopwatch
-
-  time = stopwatch.read(); // update timer display with formatted time;
-
+  time = stopwatch.read();
   timerDisplay.textContent = formatTime(time);
-  statsDisplay.textContent = formatTime(time); //reset the stopwatch
-
   stopwatch.reset();
   saveToLocalStorage();
 }
 
+function resetStopwatch() {
+  clearInterval(timerInterval);
+  stopwatchRunning = false;
+}
+
 function recordedTime() {}
+
+function lapStopwatch() {
+  time = stopwatch.read();
+  statsDisplay.textContent = formatTime(time);
+  renderStatsDisplay();
+} //function to render stats display
+
+
+function renderStatsDisplay() {
+  samplesStats.textContent = setSampleStats();
+  minStats.textContent = setMinStats();
+  meanStats.textContent = setMeanStats();
+  maxStats.textContent = setMaxStats();
+  medianStats.textContent = setMedianStats();
+  modeStats.textContent = setModeStats();
+  totalStats.textContent = setTotalStats();
+  cycleperhourStats.textContent = setCyclesStats();
+}
 
 timerContainer.addEventListener("click", function () {
   if (!stopwatchRunning) {
     startStopwatch();
   } else if (stopwatchRunning) {
-    stopStopwatch();
+    lapStopwatch();
   }
 });
 },{"statman-stopwatch":"../node_modules/statman-stopwatch/lib/Stopwatch.js","moment":"../node_modules/moment/moment.js","moment-duration-format":"../node_modules/moment-duration-format/lib/moment-duration-format.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -9401,7 +9461,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54857" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55783" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
