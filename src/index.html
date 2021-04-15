@@ -14,6 +14,10 @@
     <script src="./main.js" defer></script>
   </head>
   <body>
+    <div class="homebuttons">
+      <button button-stop type="button" class="stop">STOP</button>
+      <button button-reset type="button" class="reset">RESET</button>
+    </div>
     <main id="stopwatch" data-timer-container class="container">
       <div class="navbar">
         <h3 class="title">TEMPO DE CICLO</h3>
@@ -24,24 +28,37 @@
       <div class="mainwatch">
         <p class="mainwatchtimer" data-timer-display>00.00</p>
       </div>
-      <div class="homebuttons">
-        <button type="button" class="stop">STOP</button>
-        <button type="button" class="reset">RESET</button>
-      </div>
       <div class="resultstable">
         <div stats-left class="results left">
-          <p class="result">Samples: <span class="stat-item" data-samples>00.00</span></p>
-          <p class="result">Min: <span class="stat-item" data-min>00.00</span></p>
-          <p class="result">Mean: <span class="stat-item" data-mean>00.00</span></p>
-          <p class="result">Max: <span class="stat-item" data-max>00.00</span></p>
-          <p class="result">Median: <span class="stat-item" data-median>00.00</span></p>
-          <p class="result">Mode: <span class="stat-item" data-mode>00.00</span></p>
-          <p class="result">Total: <span class="stat-item" data-total>00.00</span></p>
-          <p class="result">Cycles per hour: <span class="stat-item" data-cyclesperhour>00.00</span></p>
+          <p class="result">
+            Samples: <span class="stat-item" data-samples>00.00</span>
+          </p>
+          <p class="result">
+            Min: <span class="stat-item" data-min>00.00</span>
+          </p>
+          <p class="result">
+            Mean: <span class="stat-item" data-mean>00.00</span>
+          </p>
+          <p class="result">
+            Max: <span class="stat-item" data-max>00.00</span>
+          </p>
+          <p class="result">
+            Median: <span class="stat-item" data-median>00.00</span>
+          </p>
+          <p class="result">
+            Mode: <span class="stat-item" data-mode>00.00</span>
+          </p>
+          <p class="result">
+            Total: <span class="stat-item" data-total>00.00</span>
+          </p>
+          <p class="result">
+            Cycles per hour:
+            <span class="stat-item" data-cyclesperhour>00.00</span>
+          </p>
         </div>
         <div stats-right class="results right">
-            <p stats-timer-display class="result"></p>
-          </div>
+          <p stats-timer-display class="result"></p>
+        </div>
       </div>
     </main>
     <footer>

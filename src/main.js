@@ -13,8 +13,8 @@ let id = 0;
 const timerDisplay = document.querySelector("[data-timer-display]");
 export const timerContainer = document.querySelector("[data-timer-container]");
 // const statsDisplay = document.querySelector("[stats-timer-display]");
-const stopButton = document.getElementsByClassName("stop");
-const resetButton = document.getElementsByClassName("reset");
+const stopButton = document.querySelector('[button-stop]')
+const resetButton = document.querySelector('[button-reset]')
 const samplesDisplay = document.querySelector("[stats-right]");
 
 // query selector for stats
@@ -71,12 +71,12 @@ function stopStopwatch() {
   stopwatchRunning = false;
   time = stopwatch.read();
   timerDisplay.textContent = formatTime(time);
-  stopwatch.reset();
   saveToLocalStorage();
 }
 
 function resetStopwatch() {
   clearInterval(timerInterval);
+  stopwatch.reset();
 }
 
 function updateDisplayRecordedTime() {
@@ -119,7 +119,8 @@ timerContainer.addEventListener("click", () => {
 
 stopButton.addEventListener("click", () => {
   if (stopwatchRunning) {
-    // stopStopwatch();
-    stopwatch.reset();
+    stopStopwatch();
+  } else if (!stopwatchRunning) {
+    startStopwatch();
   }
 });

@@ -9340,8 +9340,8 @@ var timerDisplay = document.querySelector("[data-timer-display]");
 var timerContainer = document.querySelector("[data-timer-container]"); // const statsDisplay = document.querySelector("[stats-timer-display]");
 
 exports.timerContainer = timerContainer;
-var stopButton = document.getElementsByClassName("stop");
-var resetButton = document.getElementsByClassName("reset");
+var stopButton = document.querySelector('[button-stop]');
+var resetButton = document.querySelector('[button-reset]');
 var samplesDisplay = document.querySelector("[stats-right]"); // query selector for stats
 
 var samplesStats = document.querySelector("[data-samples]");
@@ -9400,12 +9400,12 @@ function stopStopwatch() {
   stopwatchRunning = false;
   time = stopwatch.read();
   timerDisplay.textContent = formatTime(time);
-  stopwatch.reset();
   saveToLocalStorage();
 }
 
 function resetStopwatch() {
   clearInterval(timerInterval);
+  stopwatch.reset();
 }
 
 function updateDisplayRecordedTime() {
@@ -9446,8 +9446,9 @@ timerContainer.addEventListener("click", function () {
 });
 stopButton.addEventListener("click", function () {
   if (stopwatchRunning) {
-    // stopStopwatch();
-    stopwatch.reset();
+    stopStopwatch();
+  } else if (!stopwatchRunning) {
+    startStopwatch();
   }
 });
 },{"statman-stopwatch":"../node_modules/statman-stopwatch/lib/Stopwatch.js","moment":"../node_modules/moment/moment.js","moment-duration-format":"../node_modules/moment-duration-format/lib/moment-duration-format.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -9478,7 +9479,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60261" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61585" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
