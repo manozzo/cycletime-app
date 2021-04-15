@@ -1,19 +1,21 @@
 const Stopwatch = require("statman-stopwatch");
 const stopwatch = new Stopwatch();
-// var moment = require("moment");
 import moment from "moment";
 var momentDurationFormatSetup = require("moment-duration-format");
 
 let stopwatchRunning = false;
 let time;
+let newTime;
 let timerInterval;
+let id = 0;
 
 // query selectors for timer
 const timerDisplay = document.querySelector("[data-timer-display]");
 export const timerContainer = document.querySelector("[data-timer-container]");
-const statsDisplay = document.querySelector("[stats-timer-display]");
+// const statsDisplay = document.querySelector("[stats-timer-display]");
 const stopButton = document.getElementsByClassName("stop");
 const resetButton = document.getElementsByClassName("reset");
+const samplesDisplay = document.querySelector("[stats-right]");
 
 // query selector for stats
 const samplesStats = document.querySelector("[data-samples]");
@@ -35,11 +37,6 @@ const LOCAL_STORAGE_LIST_KEY = "saved.times";
 export let timesArray =
   JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || [];
 
-//function to push new time to times array
-export function pushNewTime(recordedTime) {
-  timesArray.unshift(new Time(recordedTime));
-}
-
 export function formatTime(time) {
   return moment.duration(time, "milliseconds").format("ss.SS", { trim: false });
 }
@@ -48,10 +45,15 @@ export function formatTime(time) {
 export class Time {
   constructor(recordedTime) {
     this.recordedTime = recordedTime;
-    this.id = Date.now() + Math.random();
+    this.id = id++;
     this.formattedTime = formatTime(this.recordedTime);
     this.date = moment();
   }
+}
+
+//function to push new time to times array
+export function pushNewTime(recordedTime) {
+  timesArray.unshift(new Time(recordedTime));
 }
 
 function startStopwatch() {
@@ -61,6 +63,7 @@ function startStopwatch() {
     time = stopwatch.read();
     timerDisplay.textContent = formatTime(time);
   }, 1);
+  pushNewTime(time);
 }
 
 function stopStopwatch() {
@@ -74,33 +77,49 @@ function stopStopwatch() {
 
 function resetStopwatch() {
   clearInterval(timerInterval);
-  stopwatchRunning = false;
 }
 
-function recordedTime() {}
+function updateDisplayRecordedTime() {
+  time = stopwatch.read();
+  // statsDisplay.textContent = formatTime(time);
+  if (timesArray[0].formattedTime !== "00.00") {
+    let p = document.createElement("p");
+    let textP = document.createTextNode(timesArray[0].formattedTime);
+    p.appendChild(textP);
+    samplesDisplay.appendChild(p);
+  }
+  console.log(timesArray[0].formattedTime);
+}
 
 function lapStopwatch() {
-  time = stopwatch.read();
-  statsDisplay.textContent = formatTime(time);
-  renderStatsDisplay();
+  updateDisplayRecordedTime();
+  pushNewTime(time);
+  // renderStatsDisplay();
 }
 
 //function to render stats display
-export function renderStatsDisplay() {
-  samplesStats.textContent = setSampleStats();
-  minStats.textContent = setMinStats();
-  meanStats.textContent = setMeanStats();
-  maxStats.textContent = setMaxStats();
-  medianStats.textContent = setMedianStats();
-  modeStats.textContent = setModeStats();
-  totalStats.textContent = setTotalStats();
-  cycleperhourStats.textContent = setCyclesStats();
-}
+// export function renderStatsDisplay() {
+//   samplesStats.textContent = setSampleStats();
+//   minStats.textContent = setMinStats();
+//   meanStats.textContent = setMeanStats();
+//   maxStats.textContent = setMaxStats();
+//   medianStats.textContent = setMedianStats();
+//   modeStats.textContent = setModeStats();
+//   totalStats.textContent = setTotalStats();
+//   cycleperhourStats.textContent = setCyclesStats();
+// }
 
 timerContainer.addEventListener("click", () => {
   if (!stopwatchRunning) {
     startStopwatch();
   } else if (stopwatchRunning) {
     lapStopwatch();
+  }
+});
+
+stopButton.addEventListener("click", () => {
+  if (stopwatchRunning) {
+    // stopStopwatch();
+    stopwatch.reset();
   }
 });
