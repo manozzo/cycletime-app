@@ -9314,9 +9314,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.saveToLocalStorage = saveToLocalStorage;
-exports.pushNewTime = pushNewTime;
 exports.formatTime = formatTime;
-exports.renderStatsDisplay = renderStatsDisplay;
+exports.pushNewTime = pushNewTime;
 exports.Time = exports.timesArray = exports.timerContainer = void 0;
 
 var _moment = _interopRequireDefault(require("moment"));
@@ -9327,20 +9326,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Stopwatch = require("statman-stopwatch");
 
-var stopwatch = new Stopwatch(); // var moment = require("moment");
+var stopwatch = new Stopwatch();
 
 var momentDurationFormatSetup = require("moment-duration-format");
 
 var stopwatchRunning = false;
 var time;
-var timerInterval; // query selectors for timer
+var newTime;
+var timerInterval;
+var id = 0; // query selectors for timer
 
 var timerDisplay = document.querySelector("[data-timer-display]");
-var timerContainer = document.querySelector("[data-timer-container]");
+var timerContainer = document.querySelector("[data-timer-container]"); // const statsDisplay = document.querySelector("[stats-timer-display]");
+
 exports.timerContainer = timerContainer;
-var statsDisplay = document.querySelector("[stats-timer-display]");
 var stopButton = document.getElementsByClassName("stop");
-var resetButton = document.getElementsByClassName("reset"); // query selector for stats
+var resetButton = document.getElementsByClassName("reset");
+var samplesDisplay = document.querySelector("[stats-right]"); // query selector for stats
 
 var samplesStats = document.querySelector("[data-samples]");
 var minStats = document.querySelector("[data-min]");
@@ -9357,13 +9359,8 @@ function saveToLocalStorage() {
 
 
 var LOCAL_STORAGE_LIST_KEY = "saved.times";
-var timesArray = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || []; //function to push new time to times array
-
+var timesArray = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || [];
 exports.timesArray = timesArray;
-
-function pushNewTime(recordedTime) {
-  timesArray.unshift(new Time(recordedTime));
-}
 
 function formatTime(time) {
   return _moment.default.duration(time, "milliseconds").format("ss.SS", {
@@ -9376,12 +9373,17 @@ var Time = function Time(recordedTime) {
   _classCallCheck(this, Time);
 
   this.recordedTime = recordedTime;
-  this.id = Date.now() + Math.random();
+  this.id = id++;
   this.formattedTime = formatTime(this.recordedTime);
   this.date = (0, _moment.default)();
-};
+}; //function to push new time to times array
+
 
 exports.Time = Time;
+
+function pushNewTime(recordedTime) {
+  timesArray.unshift(new Time(recordedTime));
+}
 
 function startStopwatch() {
   stopwatch.start();
@@ -9390,6 +9392,7 @@ function startStopwatch() {
     time = stopwatch.read();
     timerDisplay.textContent = formatTime(time);
   }, 1);
+  pushNewTime(time);
 }
 
 function stopStopwatch() {
@@ -9403,34 +9406,48 @@ function stopStopwatch() {
 
 function resetStopwatch() {
   clearInterval(timerInterval);
-  stopwatchRunning = false;
 }
 
-function recordedTime() {}
+function updateDisplayRecordedTime() {
+  time = stopwatch.read(); // statsDisplay.textContent = formatTime(time);
+
+  if (timesArray[0].formattedTime !== "00.00") {
+    var p = document.createElement("p");
+    var textP = document.createTextNode(timesArray[0].formattedTime);
+    p.appendChild(textP);
+    samplesDisplay.appendChild(p);
+  }
+
+  console.log(timesArray[0].formattedTime);
+}
 
 function lapStopwatch() {
-  time = stopwatch.read();
-  statsDisplay.textContent = formatTime(time);
-  renderStatsDisplay();
+  updateDisplayRecordedTime();
+  pushNewTime(time); // renderStatsDisplay();
 } //function to render stats display
+// export function renderStatsDisplay() {
+//   samplesStats.textContent = setSampleStats();
+//   minStats.textContent = setMinStats();
+//   meanStats.textContent = setMeanStats();
+//   maxStats.textContent = setMaxStats();
+//   medianStats.textContent = setMedianStats();
+//   modeStats.textContent = setModeStats();
+//   totalStats.textContent = setTotalStats();
+//   cycleperhourStats.textContent = setCyclesStats();
+// }
 
-
-function renderStatsDisplay() {
-  samplesStats.textContent = setSampleStats();
-  minStats.textContent = setMinStats();
-  meanStats.textContent = setMeanStats();
-  maxStats.textContent = setMaxStats();
-  medianStats.textContent = setMedianStats();
-  modeStats.textContent = setModeStats();
-  totalStats.textContent = setTotalStats();
-  cycleperhourStats.textContent = setCyclesStats();
-}
 
 timerContainer.addEventListener("click", function () {
   if (!stopwatchRunning) {
     startStopwatch();
   } else if (stopwatchRunning) {
     lapStopwatch();
+  }
+});
+stopButton.addEventListener("click", function () {
+  if (stopwatchRunning) {
+    // stopStopwatch();
+    stopwatch.reset();
   }
 });
 },{"statman-stopwatch":"../node_modules/statman-stopwatch/lib/Stopwatch.js","moment":"../node_modules/moment/moment.js","moment-duration-format":"../node_modules/moment-duration-format/lib/moment-duration-format.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -9461,7 +9478,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55783" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60261" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
