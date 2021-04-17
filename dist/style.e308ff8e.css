@@ -32,21 +32,22 @@ body {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  background-color: white;
+  background-color: #e6e6e6;
   height: 600px;
-  cursor: pointer;
-  border-radius: 16px;
-  background: #e6e6e6;
-  box-shadow: inset 11px 11px 11px #717171, inset -11px -11px 11px #ffffff;
 }
 
 .mainwatch {
-  font-size: 54px;
   width: 130px;
-  letter-spacing: 0.5rem;
-  height: 200px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
 }
 
+.mainwatchtimer {
+  letter-spacing: 0.5rem;
+  font-size: 54px;
+  
+}
 
 .homebuttons {
   padding: 10px;
@@ -55,7 +56,6 @@ body {
   text-align: center;
   display: flex;
   justify-content: space-evenly;
-  position: absolute;
   top: 300px;
   left: 10%;
 }

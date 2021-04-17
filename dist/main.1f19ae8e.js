@@ -9310,14 +9310,6 @@ var define;
 },{"moment":"../node_modules/moment/moment.js"}],"main.js":[function(require,module,exports) {
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.saveToLocalStorage = saveToLocalStorage;
-exports.formatTime = formatTime;
-exports.pushNewTime = pushNewTime;
-exports.Time = exports.timesArray = exports.timerContainer = void 0;
-
 var _moment = _interopRequireDefault(require("moment"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -9332,16 +9324,13 @@ var momentDurationFormatSetup = require("moment-duration-format");
 
 var stopwatchRunning = false;
 var time;
-var newTime;
 var timerInterval;
-var id = 0; // query selectors for timer
+var id = 100; // query selectors for timer
 
 var timerDisplay = document.querySelector("[data-timer-display]");
-var timerContainer = document.querySelector("[data-timer-container]"); // const statsDisplay = document.querySelector("[stats-timer-display]");
-
-exports.timerContainer = timerContainer;
-var stopButton = document.querySelector('[button-stop]');
-var resetButton = document.querySelector('[button-reset]');
+var startButton = document.getElementById("btnStart");
+var stopButton = document.getElementById("btnStop");
+var resetButton = document.getElementById("btnReset");
 var samplesDisplay = document.querySelector("[stats-right]"); // query selector for stats
 
 var samplesStats = document.querySelector("[data-samples]");
@@ -9359,13 +9348,12 @@ function saveToLocalStorage() {
 
 
 var LOCAL_STORAGE_LIST_KEY = "saved.times";
-var timesArray = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || [];
-exports.timesArray = timesArray;
+var timesArray = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || []; // function to format time
 
 function formatTime(time) {
-  return _moment.default.duration(time, "milliseconds").format("ss.SS", {
+  return _moment.default.duration(time / 0.6, "milliseconds").format("ss.SS", {
     trim: false
-  });
+  }); // remember to set the opition to change the measurement unit changing time/0.6
 } //class to create time objects
 
 
@@ -9379,8 +9367,6 @@ var Time = function Time(recordedTime) {
 }; //function to push new time to times array
 
 
-exports.Time = Time;
-
 function pushNewTime(recordedTime) {
   timesArray.unshift(new Time(recordedTime));
 }
@@ -9393,53 +9379,53 @@ function startStopwatch() {
     timerDisplay.textContent = formatTime(time);
   }, 1);
   pushNewTime(time);
+  saveToLocalStorage();
 }
 
 function stopStopwatch() {
   stopwatch.stop();
   stopwatchRunning = false;
-  time = stopwatch.read();
-  timerDisplay.textContent = formatTime(time);
+  clearInterval(timerInterval);
   saveToLocalStorage();
 }
 
 function resetStopwatch() {
-  clearInterval(timerInterval);
   stopwatch.reset();
+  stopwatchRunning = false;
+  samplesDisplay.innerHTML = "";
 }
 
 function updateDisplayRecordedTime() {
-  time = stopwatch.read(); // statsDisplay.textContent = formatTime(time);
-
-  if (timesArray[0].formattedTime !== "00.00") {
-    var p = document.createElement("p");
-    var textP = document.createTextNode(timesArray[0].formattedTime);
-    p.appendChild(textP);
-    samplesDisplay.appendChild(p);
-  }
-
+  time = stopwatch.read();
+  var p = document.createElement("p");
+  var textP = document.createTextNode(timesArray[0].formattedTime);
+  p.appendChild(textP);
+  samplesDisplay.appendChild(p);
   console.log(timesArray[0].formattedTime);
 }
 
 function lapStopwatch() {
-  updateDisplayRecordedTime();
-  pushNewTime(time); // renderStatsDisplay();
+  pushNewTime(time);
+  updateDisplayRecordedTime(); // renderStatsDisplay();
 } //function to render stats display
-// export function renderStatsDisplay() {
-//   samplesStats.textContent = setSampleStats();
-//   minStats.textContent = setMinStats();
-//   meanStats.textContent = setMeanStats();
-//   maxStats.textContent = setMaxStats();
-//   medianStats.textContent = setMedianStats();
-//   modeStats.textContent = setModeStats();
-//   totalStats.textContent = setTotalStats();
-//   cycleperhourStats.textContent = setCyclesStats();
-// }
 
 
-timerContainer.addEventListener("click", function () {
+function renderStatsDisplay() {
+  samplesStats.textContent = setSampleStats();
+  minStats.textContent = setMinStats();
+  meanStats.textContent = setMeanStats();
+  maxStats.textContent = setMaxStats();
+  medianStats.textContent = setMedianStats();
+  modeStats.textContent = setModeStats();
+  totalStats.textContent = setTotalStats();
+  cycleperhourStats.textContent = setCyclesStats();
+}
+
+startButton.addEventListener("click", function () {
   if (!stopwatchRunning) {
     startStopwatch();
+    console.log(stopwatchRunning);
+    startButton.textContent = "LAP";
   } else if (stopwatchRunning) {
     lapStopwatch();
   }
@@ -9447,9 +9433,13 @@ timerContainer.addEventListener("click", function () {
 stopButton.addEventListener("click", function () {
   if (stopwatchRunning) {
     stopStopwatch();
-  } else if (!stopwatchRunning) {
-    startStopwatch();
+    console.log(stopwatchRunning);
+    startButton.textContent = "START";
   }
+});
+resetButton.addEventListener("click", function () {
+  resetStopwatch();
+  console.log(stopwatchRunning);
 });
 },{"statman-stopwatch":"../node_modules/statman-stopwatch/lib/Stopwatch.js","moment":"../node_modules/moment/moment.js","moment-duration-format":"../node_modules/moment-duration-format/lib/moment-duration-format.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -9479,7 +9469,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61585" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51812" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

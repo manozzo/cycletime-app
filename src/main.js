@@ -5,16 +5,14 @@ var momentDurationFormatSetup = require("moment-duration-format");
 
 let stopwatchRunning = false;
 let time;
-let newTime;
 let timerInterval;
-let id = 0;
+let id = 100;
 
 // query selectors for timer
 const timerDisplay = document.querySelector("[data-timer-display]");
-export const timerContainer = document.querySelector("[data-timer-container]");
-// const statsDisplay = document.querySelector("[stats-timer-display]");
-const stopButton = document.querySelector('[button-stop]')
-const resetButton = document.querySelector('[button-reset]')
+const startButton = document.getElementById("btnStart");
+const stopButton = document.getElementById("btnStop");
+const resetButton = document.getElementById("btnReset");
 const samplesDisplay = document.querySelector("[stats-right]");
 
 // query selector for stats
@@ -28,21 +26,24 @@ const totalStats = document.querySelector("[data-total]");
 const cycleperhourStats = document.querySelector("[data-cyclesperhour]");
 
 // function to save to local storage
-export function saveToLocalStorage() {
+function saveToLocalStorage() {
   localStorage.setItem(LOCAL_STORAGE_LIST_KEY, JSON.stringify(timesArray));
 }
 
 // array of time objects and local storage key
 const LOCAL_STORAGE_LIST_KEY = "saved.times";
-export let timesArray =
-  JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || [];
+let timesArray = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LIST_KEY)) || [];
 
-export function formatTime(time) {
-  return moment.duration(time, "milliseconds").format("ss.SS", { trim: false });
+// function to format time
+function formatTime(time) {
+  return moment
+    .duration(time / 0.6, "milliseconds")
+    .format("ss.SS", { trim: false });
+  // remember to set the opition to change the measurement unit changing time/0.6
 }
 
 //class to create time objects
-export class Time {
+class Time {
   constructor(recordedTime) {
     this.recordedTime = recordedTime;
     this.id = id++;
@@ -52,7 +53,7 @@ export class Time {
 }
 
 //function to push new time to times array
-export function pushNewTime(recordedTime) {
+function pushNewTime(recordedTime) {
   timesArray.unshift(new Time(recordedTime));
 }
 
@@ -64,54 +65,55 @@ function startStopwatch() {
     timerDisplay.textContent = formatTime(time);
   }, 1);
   pushNewTime(time);
+  saveToLocalStorage();
 }
 
 function stopStopwatch() {
   stopwatch.stop();
   stopwatchRunning = false;
-  time = stopwatch.read();
-  timerDisplay.textContent = formatTime(time);
+  clearInterval(timerInterval);
   saveToLocalStorage();
 }
 
 function resetStopwatch() {
-  clearInterval(timerInterval);
   stopwatch.reset();
+  stopwatchRunning = false;
+  samplesDisplay.innerHTML = "";
 }
 
 function updateDisplayRecordedTime() {
   time = stopwatch.read();
-  // statsDisplay.textContent = formatTime(time);
-  if (timesArray[0].formattedTime !== "00.00") {
-    let p = document.createElement("p");
-    let textP = document.createTextNode(timesArray[0].formattedTime);
-    p.appendChild(textP);
-    samplesDisplay.appendChild(p);
-  }
+  let p = document.createElement("p");
+  let textP = document.createTextNode(timesArray[0].formattedTime);
+  p.appendChild(textP);
+  samplesDisplay.appendChild(p);
   console.log(timesArray[0].formattedTime);
 }
 
 function lapStopwatch() {
-  updateDisplayRecordedTime();
   pushNewTime(time);
+  updateDisplayRecordedTime();
+
   // renderStatsDisplay();
 }
 
 //function to render stats display
-// export function renderStatsDisplay() {
-//   samplesStats.textContent = setSampleStats();
-//   minStats.textContent = setMinStats();
-//   meanStats.textContent = setMeanStats();
-//   maxStats.textContent = setMaxStats();
-//   medianStats.textContent = setMedianStats();
-//   modeStats.textContent = setModeStats();
-//   totalStats.textContent = setTotalStats();
-//   cycleperhourStats.textContent = setCyclesStats();
-// }
+function renderStatsDisplay() {
+  samplesStats.textContent = setSampleStats();
+  minStats.textContent = setMinStats();
+  meanStats.textContent = setMeanStats();
+  maxStats.textContent = setMaxStats();
+  medianStats.textContent = setMedianStats();
+  modeStats.textContent = setModeStats();
+  totalStats.textContent = setTotalStats();
+  cycleperhourStats.textContent = setCyclesStats();
+}
 
-timerContainer.addEventListener("click", () => {
+startButton.addEventListener("click", () => {
   if (!stopwatchRunning) {
     startStopwatch();
+    console.log(stopwatchRunning);
+    startButton.textContent = "LAP";
   } else if (stopwatchRunning) {
     lapStopwatch();
   }
@@ -120,7 +122,12 @@ timerContainer.addEventListener("click", () => {
 stopButton.addEventListener("click", () => {
   if (stopwatchRunning) {
     stopStopwatch();
-  } else if (!stopwatchRunning) {
-    startStopwatch();
+    console.log(stopwatchRunning);
+    startButton.textContent = "START";
   }
+});
+
+resetButton.addEventListener("click", () => {
+  resetStopwatch();
+  console.log(stopwatchRunning);
 });

@@ -11,10 +11,6 @@
     <script src="/main.1f19ae8e.js" defer=""></script>
   <script src="/style.e308ff8e.js"></script></head>
   <body>
-    <div class="homebuttons">
-      <button button-stop="" type="button" class="stop">STOP</button>
-      <button button-reset="" type="button" class="reset">RESET</button>
-    </div>
     <main id="stopwatch" data-timer-container="" class="container">
       <div class="navbar">
         <h3 class="title">TEMPO DE CICLO</h3>
@@ -25,7 +21,18 @@
       <div class="mainwatch">
         <p class="mainwatchtimer" data-timer-display="">00.00</p>
       </div>
-      <div class="resultstable">
+      <div class="homebuttons">
+        <button id="btnStart" button-start="" type="button" class="start">
+          START
+        </button>
+        <button id="btnStop" button-stop="" type="button" class="stop">
+          STOP
+        </button>
+        <button id="btnReset" button-reset="" type="button" class="reset">
+          RESET
+        </button>
+      </div>
+      <div id="resultsTable" class="resultstable">
         <div stats-left="" class="results left">
           <p class="result">
             Samples: <span class="stat-item" data-samples="">00.00</span>
