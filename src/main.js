@@ -1,12 +1,21 @@
 const Stopwatch = require("statman-stopwatch");
 const stopwatch = new Stopwatch();
 import moment from "moment";
+
+//I don't know why yet, bu without this import the code will crash
 var momentDurationFormatSetup = require("moment-duration-format");
 
 let stopwatchRunning = false;
 let time;
 let timerInterval;
-let id = 100;
+let id = 1;
+let absoluteTime;
+let incrementalTime;
+
+// set the initial state of array of times
+localStorage.clear();
+timesArray = [];
+saveToLocalStorage();
 
 // query selectors for timer
 const timerDisplay = document.querySelector("[data-timer-display]");
@@ -39,7 +48,7 @@ function formatTime(time) {
   return moment
     .duration(time / 0.6, "milliseconds")
     .format("ss.SS", { trim: false });
-  // remember to set the opition to change the measurement unit changing time/0.6
+  // remember to set the option to change the measurement unit changing time/0.6
 }
 
 //class to create time objects
@@ -66,53 +75,86 @@ function startStopwatch() {
   }, 1);
   pushNewTime(time);
   saveToLocalStorage();
+  setTotalStats();
 }
 
 function stopStopwatch() {
   stopwatch.stop();
-  stopwatchRunning = false;
   clearInterval(timerInterval);
+  stopwatchRunning = false;
   saveToLocalStorage();
 }
 
 function resetStopwatch() {
   stopwatch.reset();
   stopwatchRunning = false;
-  samplesDisplay.innerHTML = "";
+  clearAllStats();
+  saveToLocalStorage();
 }
 
 function updateDisplayRecordedTime() {
   time = stopwatch.read();
   let p = document.createElement("p");
-  let textP = document.createTextNode(timesArray[0].formattedTime);
+  let textP = document.createTextNode((parseFloat(timesArray[0].formattedTime) - parseFloat(timesArray[1].formattedTime)).toFixed(2));
   p.appendChild(textP);
   samplesDisplay.appendChild(p);
-  console.log(timesArray[0].formattedTime);
+
+  // time = moment.duration(stopwatch.read(), 'milliseconds');
+  // timerDisplay.textContent = formatTime(time);
 }
 
 function lapStopwatch() {
   pushNewTime(time);
   updateDisplayRecordedTime();
+  renderStatsDisplay();
+}
 
-  // renderStatsDisplay();
+function clearAllStats() {
+  samplesDisplay.textContent = "";
+  samplesStats.textContent = "00.00";
+  minStats.textContent = "00.00";
+  meanStats.textContent = "00.00";
+  maxStats.textContent = "00.00";
+  medianStats.textContent = "00.00";
+  modeStats.textContent = "00.00";
+  totalStats.textContent = "00.00";
+  cycleperhourStats.textContent = "00";
+  localStorage.clear();
+  timesArray = [];
+}
+
+function setSampleStats() {
+  samplesStats.textContent = timesArray.length - 1;
+}
+
+function setTotalStats() {
+  timerInterval = setInterval(() => {
+    time = stopwatch.read();
+    totalStats.textContent = formatTime(time);
+  }, 1);
+}
+
+function setCyclesStats() {
+  cycleperhourStats.textContent = (6000/(parseFloat(timesArray[0].formattedTime) - parseFloat(timesArray[1].formattedTime))).toFixed(0)
 }
 
 //function to render stats display
 function renderStatsDisplay() {
-  samplesStats.textContent = setSampleStats();
-  minStats.textContent = setMinStats();
-  meanStats.textContent = setMeanStats();
-  maxStats.textContent = setMaxStats();
-  medianStats.textContent = setMedianStats();
-  modeStats.textContent = setModeStats();
-  totalStats.textContent = setTotalStats();
-  cycleperhourStats.textContent = setCyclesStats();
+  setSampleStats();
+  // minStats.textContent = setMinStats();
+  // meanStats.textContent = setMeanStats();
+  // maxStats.textContent = setMaxStats();
+  // medianStats.textContent = setMedianStats();
+  // modeStats.textContent = setModeStats();
+  setTotalStats();
+  setCyclesStats();
 }
+
+// buttons functions
 
 startButton.addEventListener("click", () => {
   if (!stopwatchRunning) {
     startStopwatch();
-    console.log(stopwatchRunning);
     startButton.textContent = "LAP";
   } else if (stopwatchRunning) {
     lapStopwatch();
@@ -122,12 +164,11 @@ startButton.addEventListener("click", () => {
 stopButton.addEventListener("click", () => {
   if (stopwatchRunning) {
     stopStopwatch();
-    console.log(stopwatchRunning);
     startButton.textContent = "START";
   }
 });
 
 resetButton.addEventListener("click", () => {
   resetStopwatch();
-  console.log(stopwatchRunning);
+  startButton.textContent = "START";
 });

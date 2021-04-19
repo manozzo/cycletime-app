@@ -71,6 +71,8 @@ body {
   border-radius: 13px;
   background: #e6e6e6;
   box-shadow: 5px 5px 10px #838383, -5px -5px 10px #ffffff;
+  margin: 5px;
+  padding: 10px;
 }
 
 .lap {
