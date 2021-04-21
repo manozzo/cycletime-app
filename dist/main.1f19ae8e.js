@@ -9318,16 +9318,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Stopwatch = require("statman-stopwatch");
 
-var stopwatch = new Stopwatch();
+var stopwatch = new Stopwatch(); // import math, { mean } from "mathjs";
 
-//I don't know why yet, bu without this import the code will crash
-var momentDurationFormatSetup = require("moment-duration-format");
+//I don't know why yet, but without this import the code will crash
+var momentDurationFormatSetup = require("moment-duration-format"); // console.log(math.mean(2, 5))
+
 
 var stopwatchRunning = false;
 var time;
 var timerInterval;
 var id = 1;
-var absoluteTime;
 var incrementalTime; // set the initial state of array of times
 
 localStorage.clear();
@@ -9375,7 +9375,8 @@ var Time = function Time(recordedTime) {
 
 
 function pushNewTime(recordedTime) {
-  timesArray.unshift(new Time(recordedTime));
+  // timesArray.unshift(new Time(recordedTime));
+  timesArray.push(new Time(recordedTime));
 }
 
 function startStopwatch() {
@@ -9407,10 +9408,19 @@ function resetStopwatch() {
 function updateDisplayRecordedTime() {
   time = stopwatch.read();
   var p = document.createElement("p");
-  var textP = document.createTextNode((parseFloat(timesArray[0].formattedTime) - parseFloat(timesArray[1].formattedTime)).toFixed(2));
-  p.appendChild(textP);
-  samplesDisplay.appendChild(p); // time = moment.duration(stopwatch.read(), 'milliseconds');
+
+  if (timesArray.length == 1) {
+    var textP = document.createTextNode(timesArray[1].formattedTime);
+    p.appendChild(textP);
+    samplesDisplay.appendChild(p);
+  } else {
+    var _textP = document.createTextNode((timesArray[timesArray.length - 1].formattedTime - timesArray[timesArray.length - 2].formattedTime).toFixed(2));
+
+    p.appendChild(_textP);
+    samplesDisplay.appendChild(p);
+  } // time = moment.duration(stopwatch.read(), 'milliseconds');
   // timerDisplay.textContent = formatTime(time);
+
 }
 
 function lapStopwatch() {
@@ -9421,7 +9431,7 @@ function lapStopwatch() {
 
 function clearAllStats() {
   samplesDisplay.textContent = "";
-  samplesStats.textContent = "00.00";
+  samplesStats.textContent = "00";
   minStats.textContent = "00.00";
   meanStats.textContent = "00.00";
   maxStats.textContent = "00.00";
@@ -9431,7 +9441,15 @@ function clearAllStats() {
   cycleperhourStats.textContent = "00";
   localStorage.clear();
   timesArray = [];
-}
+} // function setMeanStats() {
+// var total = 0;
+// for (var i = 0; i < timesArray.length; i++) {
+//   total += timesArray[i].formattedTime;
+// }
+// var avg = total / timesArray.length;
+// meanStats.textContent = math.mean(1, 3);
+// }
+
 
 function setSampleStats() {
   samplesStats.textContent = timesArray.length - 1;
@@ -9445,13 +9463,17 @@ function setTotalStats() {
 }
 
 function setCyclesStats() {
-  cycleperhourStats.textContent = (6000 / (parseFloat(timesArray[0].formattedTime) - parseFloat(timesArray[1].formattedTime))).toFixed(0);
+  if (timesArray.length == 1) {
+    cycleperhourStats.textContent = (6000 / parseFloat(timesArray[1].formattedTime)).toFixed(0);
+  } else {
+    cycleperhourStats.textContent = (6000 / (parseFloat(timesArray[timesArray.length - 1].formattedTime) - parseFloat(timesArray[timesArray.length - 2].formattedTime))).toFixed(0);
+  }
 } //function to render stats display
 
 
 function renderStatsDisplay() {
   setSampleStats(); // minStats.textContent = setMinStats();
-  // meanStats.textContent = setMeanStats();
+  // setMeanStats();
   // maxStats.textContent = setMaxStats();
   // medianStats.textContent = setMedianStats();
   // modeStats.textContent = setModeStats();
@@ -9507,7 +9529,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56732" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62146" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

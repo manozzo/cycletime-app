@@ -1,15 +1,17 @@
 const Stopwatch = require("statman-stopwatch");
 const stopwatch = new Stopwatch();
+// import math, { mean } from "mathjs";
 import moment from "moment";
 
-//I don't know why yet, bu without this import the code will crash
+//I don't know why yet, but without this import the code will crash
 var momentDurationFormatSetup = require("moment-duration-format");
+
+// console.log(math.mean(2, 5))
 
 let stopwatchRunning = false;
 let time;
 let timerInterval;
 let id = 1;
-let absoluteTime;
 let incrementalTime;
 
 // set the initial state of array of times
@@ -63,7 +65,8 @@ class Time {
 
 //function to push new time to times array
 function pushNewTime(recordedTime) {
-  timesArray.unshift(new Time(recordedTime));
+  // timesArray.unshift(new Time(recordedTime));
+  timesArray.push(new Time(recordedTime));
 }
 
 function startStopwatch() {
@@ -95,9 +98,20 @@ function resetStopwatch() {
 function updateDisplayRecordedTime() {
   time = stopwatch.read();
   let p = document.createElement("p");
-  let textP = document.createTextNode((parseFloat(timesArray[0].formattedTime) - parseFloat(timesArray[1].formattedTime)).toFixed(2));
-  p.appendChild(textP);
-  samplesDisplay.appendChild(p);
+  if (timesArray.length == 1) {
+    let textP = document.createTextNode(timesArray[1].formattedTime);
+    p.appendChild(textP);
+    samplesDisplay.appendChild(p);
+  } else {
+    let textP = document.createTextNode(
+      (
+        timesArray[timesArray.length - 1].formattedTime -
+        timesArray[timesArray.length - 2].formattedTime
+      ).toFixed(2)
+    );
+    p.appendChild(textP);
+    samplesDisplay.appendChild(p);
+  }
 
   // time = moment.duration(stopwatch.read(), 'milliseconds');
   // timerDisplay.textContent = formatTime(time);
@@ -111,7 +125,7 @@ function lapStopwatch() {
 
 function clearAllStats() {
   samplesDisplay.textContent = "";
-  samplesStats.textContent = "00.00";
+  samplesStats.textContent = "00";
   minStats.textContent = "00.00";
   meanStats.textContent = "00.00";
   maxStats.textContent = "00.00";
@@ -122,6 +136,15 @@ function clearAllStats() {
   localStorage.clear();
   timesArray = [];
 }
+
+// function setMeanStats() {
+   // var total = 0;
+   // for (var i = 0; i < timesArray.length; i++) {
+    //   total += timesArray[i].formattedTime;
+   // }
+   // var avg = total / timesArray.length;
+   // meanStats.textContent = math.mean(1, 3);
+// }
 
 function setSampleStats() {
   samplesStats.textContent = timesArray.length - 1;
@@ -135,14 +158,24 @@ function setTotalStats() {
 }
 
 function setCyclesStats() {
-  cycleperhourStats.textContent = (6000/(parseFloat(timesArray[0].formattedTime) - parseFloat(timesArray[1].formattedTime))).toFixed(0)
+  if (timesArray.length == 1) {
+    cycleperhourStats.textContent = (
+      6000 / parseFloat(timesArray[1].formattedTime)
+    ).toFixed(0);
+  } else {
+    cycleperhourStats.textContent = (
+      6000 /
+      (parseFloat(timesArray[timesArray.length - 1].formattedTime) -
+        parseFloat(timesArray[timesArray.length - 2].formattedTime))
+    ).toFixed(0);
+  }
 }
 
 //function to render stats display
 function renderStatsDisplay() {
   setSampleStats();
   // minStats.textContent = setMinStats();
-  // meanStats.textContent = setMeanStats();
+  // setMeanStats();
   // maxStats.textContent = setMaxStats();
   // medianStats.textContent = setMedianStats();
   // modeStats.textContent = setModeStats();
