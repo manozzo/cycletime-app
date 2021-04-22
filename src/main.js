@@ -1,40 +1,51 @@
-import { create, all, parse, mean } from "mathjs";
+import { create, all, mean } from "mathjs";
 const math = create(all);
 const Stopwatch = require("statman-stopwatch");
 const stopwatch = new Stopwatch();
 import moment from "moment";
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
+
 
 //I don't know why yet, but without this import the code will crash
 var momentDurationFormatSetup = require("moment-duration-format");
 
-// const labels = [
-//   'January',
-//   'February',
-//   'March',
-//   'April',
-//   'May',
-//   'June',
-// ];
-// const data = {
-//   labels: labels,
-//   datasets: [{
-//     label: 'My First dataset',
-//     backgroundColor: 'rgb(255, 99, 132)',
-//     borderColor: 'rgb(255, 99, 132)',
-//     data: [0, 10, 5, 2, 20, 30, 45],
-//   }]
-// };
 
-// const config = {
-//   type: 'line',
-//   data,
-//   options: {}
-// };
-
-// var myChart = new Chart(
-//   document.getElementById('myChart'),
-//   config
-// );
+// var ctx = document.getElementById('myChart');
+// var myChart = new Chart(ctx, {
+//     type: 'bar',
+//     data: {
+//         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+//         datasets: [{
+//             label: '# of Votes',
+//             data: [12, 19, 3, 5, 2, 3],
+//             backgroundColor: [
+//                 'rgba(255, 99, 132, 0.2)',
+//                 'rgba(54, 162, 235, 0.2)',
+//                 'rgba(255, 206, 86, 0.2)',
+//                 'rgba(75, 192, 192, 0.2)',
+//                 'rgba(153, 102, 255, 0.2)',
+//                 'rgba(255, 159, 64, 0.2)'
+//             ],
+//             borderColor: [
+//                 'rgba(255, 99, 132, 1)',
+//                 'rgba(54, 162, 235, 1)',
+//                 'rgba(255, 206, 86, 1)',
+//                 'rgba(75, 192, 192, 1)',
+//                 'rgba(153, 102, 255, 1)',
+//                 'rgba(255, 159, 64, 1)'
+//             ],
+//             borderWidth: 1
+//         }]
+//     },
+//     options: {
+//         scales: {
+//             y: {
+//                 beginAtZero: true
+//             }
+//         }
+//     }
+// });
 
 let stopwatchRunning = false;
 let time;
@@ -60,7 +71,6 @@ const minStats = document.querySelector("[data-min]");
 const meanStats = document.querySelector("[data-mean]");
 const maxStats = document.querySelector("[data-max]");
 const medianStats = document.querySelector("[data-median]");
-const modeStats = document.querySelector("[data-mode]");
 const totalStats = document.querySelector("[data-total]");
 const cycleperhourStats = document.querySelector("[data-cyclesperhour]");
 
@@ -153,12 +163,6 @@ function updateDisplayRecordedTime() {
     p.appendChild(textP);
     samplesDisplay.appendChild(p);
   } else {
-    // let textP = document.createTextNode(
-    //   (
-    //     timesArray[timesArray.length - 1].formattedTime -
-    //     timesArray[timesArray.length - 2].formattedTime
-    //   ).toFixed(2)
-    // );
     let textP = document.createTextNode(times[times.length - 1]);
     p.appendChild(textP);
     samplesDisplay.appendChild(p);
@@ -172,7 +176,6 @@ function clearAllStats() {
   meanStats.textContent = "00.00";
   maxStats.textContent = "00.00";
   medianStats.textContent = "00.00";
-  modeStats.textContent = "00.00";
   totalStats.textContent = "00.00";
   cycleperhourStats.textContent = "00";
   localStorage.clear();
@@ -181,13 +184,16 @@ function clearAllStats() {
 }
 
 function setMeanStats() {
-  if (timesArray.length >= 3) {
-    meanStats.textContent = (
-      parseFloat(timesArray[timesArray.length - 1].formattedTime) /
-      (timesArray.length - 1)
-    ).toFixed(2);
-  } else {
-    meanStats.textContent = "00.00";
+  // if (timesArray.length >= 3) {
+  //   meanStats.textContent = (
+  //     parseFloat(timesArray[timesArray.length - 1].formattedTime) /
+  //     (timesArray.length - 1)
+  //   ).toFixed(2);
+  // } else {
+  //   meanStats.textContent = "00.00";
+  // }
+  if (times.length != 0) {
+    meanStats.textContent = math.mean(times).toFixed(2);
   }
 }
 
@@ -225,20 +231,24 @@ function setMaxStats() {
   }
 }
 
+function setMedianStats() {
+  if (times.length != 0) {
+    medianStats.textContent = math.median(times).toFixed(2);
+  }
+}
+
 //function to render stats display
 function renderStatsDisplay() {
   setSampleStats();
-  setTotalStats();
-  setCyclesStats();
   setMinStats();
   setMeanStats();
   setMaxStats();
-  // medianStats.textContent = setMedianStats();
-  // modeStats.textContent = setModeStats();
+  setMedianStats();
+  setTotalStats();
+  setCyclesStats();
 }
 
 // buttons functions
-
 startButton.addEventListener("click", () => {
   if (!stopwatchRunning) {
     startStopwatch();
