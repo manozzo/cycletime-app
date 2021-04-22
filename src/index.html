@@ -12,14 +12,16 @@
     />
     <link rel="stylesheet" type="text/css" href="./style.css" />
     <script src="./main.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../node_modules/mathjs/lib/browser/math.js" type="text/javascript" defer></script>
   </head>
   <body>
     <main id="stopwatch" data-timer-container class="container">
       <div class="navbar">
         <h3 class="title">TEMPO DE CICLO</h3>
       </div>
-      <div class="inst">
-        <p></p>
+      <div class="chart">
+        <canvas id="myChart"></canvas>
       </div>
       <div class="mainwatch">
         <p class="mainwatchtimer" data-timer-display>00.00</p>

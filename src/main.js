@@ -1,18 +1,46 @@
+import { create, all, parse, mean } from "mathjs";
+const math = create(all);
 const Stopwatch = require("statman-stopwatch");
 const stopwatch = new Stopwatch();
-// import math, { mean } from "mathjs";
 import moment from "moment";
 
 //I don't know why yet, but without this import the code will crash
 var momentDurationFormatSetup = require("moment-duration-format");
 
-// console.log(math.mean(2, 5))
+// const labels = [
+//   'January',
+//   'February',
+//   'March',
+//   'April',
+//   'May',
+//   'June',
+// ];
+// const data = {
+//   labels: labels,
+//   datasets: [{
+//     label: 'My First dataset',
+//     backgroundColor: 'rgb(255, 99, 132)',
+//     borderColor: 'rgb(255, 99, 132)',
+//     data: [0, 10, 5, 2, 20, 30, 45],
+//   }]
+// };
+
+// const config = {
+//   type: 'line',
+//   data,
+//   options: {}
+// };
+
+// var myChart = new Chart(
+//   document.getElementById('myChart'),
+//   config
+// );
 
 let stopwatchRunning = false;
 let time;
 let timerInterval;
 let id = 1;
-let incrementalTime;
+let times = [];
 
 // set the initial state of array of times
 localStorage.clear();
@@ -67,6 +95,21 @@ class Time {
 function pushNewTime(recordedTime) {
   // timesArray.unshift(new Time(recordedTime));
   timesArray.push(new Time(recordedTime));
+  pushNewFormattedTimesArray();
+}
+
+function pushNewFormattedTimesArray() {
+  // function to do an array with formatted times only
+  if (timesArray.length >= 2) {
+    times.push(
+      parseFloat(
+        (
+          parseFloat(timesArray[timesArray.length - 1].formattedTime) -
+          parseFloat(timesArray[timesArray.length - 2].formattedTime)
+        ).toFixed(2)
+      )
+    );
+  }
 }
 
 function startStopwatch() {
@@ -95,32 +138,31 @@ function resetStopwatch() {
   saveToLocalStorage();
 }
 
-function updateDisplayRecordedTime() {
-  time = stopwatch.read();
-  let p = document.createElement("p");
-  if (timesArray.length == 1) {
-    let textP = document.createTextNode(timesArray[1].formattedTime);
-    p.appendChild(textP);
-    samplesDisplay.appendChild(p);
-  } else {
-    let textP = document.createTextNode(
-      (
-        timesArray[timesArray.length - 1].formattedTime -
-        timesArray[timesArray.length - 2].formattedTime
-      ).toFixed(2)
-    );
-    p.appendChild(textP);
-    samplesDisplay.appendChild(p);
-  }
-
-  // time = moment.duration(stopwatch.read(), 'milliseconds');
-  // timerDisplay.textContent = formatTime(time);
-}
-
 function lapStopwatch() {
   pushNewTime(time);
   updateDisplayRecordedTime();
   renderStatsDisplay();
+}
+
+function updateDisplayRecordedTime() {
+  time = stopwatch.read();
+  let p = document.createElement("p");
+  if (timesArray.length == 1) {
+    // let textP = document.createTextNode(timesArray[1].formattedTime)
+    let textP = document.createTextNode(times[times.length - 1]);
+    p.appendChild(textP);
+    samplesDisplay.appendChild(p);
+  } else {
+    // let textP = document.createTextNode(
+    //   (
+    //     timesArray[timesArray.length - 1].formattedTime -
+    //     timesArray[timesArray.length - 2].formattedTime
+    //   ).toFixed(2)
+    // );
+    let textP = document.createTextNode(times[times.length - 1]);
+    p.appendChild(textP);
+    samplesDisplay.appendChild(p);
+  }
 }
 
 function clearAllStats() {
@@ -135,16 +177,19 @@ function clearAllStats() {
   cycleperhourStats.textContent = "00";
   localStorage.clear();
   timesArray = [];
+  times = [];
 }
 
-// function setMeanStats() {
-   // var total = 0;
-   // for (var i = 0; i < timesArray.length; i++) {
-    //   total += timesArray[i].formattedTime;
-   // }
-   // var avg = total / timesArray.length;
-   // meanStats.textContent = math.mean(1, 3);
-// }
+function setMeanStats() {
+  if (timesArray.length >= 3) {
+    meanStats.textContent = (
+      parseFloat(timesArray[timesArray.length - 1].formattedTime) /
+      (timesArray.length - 1)
+    ).toFixed(2);
+  } else {
+    meanStats.textContent = "00.00";
+  }
+}
 
 function setSampleStats() {
   samplesStats.textContent = timesArray.length - 1;
@@ -160,27 +205,36 @@ function setTotalStats() {
 function setCyclesStats() {
   if (timesArray.length == 1) {
     cycleperhourStats.textContent = (
-      6000 / parseFloat(timesArray[1].formattedTime)
+      6000 / times[1]
     ).toFixed(0);
   } else {
     cycleperhourStats.textContent = (
-      6000 /
-      (parseFloat(timesArray[timesArray.length - 1].formattedTime) -
-        parseFloat(timesArray[timesArray.length - 2].formattedTime))
-    ).toFixed(0);
+      6000 / times[times.length - 1]).toFixed(0);
+  }
+}
+
+function setMinStats() {
+  if (times.length != 0) {
+    minStats.textContent = math.min(times);
+  }
+}
+
+function setMaxStats() {
+  if (times.length != 0) {
+    maxStats.textContent = math.max(times);
   }
 }
 
 //function to render stats display
 function renderStatsDisplay() {
   setSampleStats();
-  // minStats.textContent = setMinStats();
-  // setMeanStats();
-  // maxStats.textContent = setMaxStats();
-  // medianStats.textContent = setMedianStats();
-  // modeStats.textContent = setModeStats();
   setTotalStats();
   setCyclesStats();
+  setMinStats();
+  setMeanStats();
+  setMaxStats();
+  // medianStats.textContent = setMedianStats();
+  // modeStats.textContent = setModeStats();
 }
 
 // buttons functions

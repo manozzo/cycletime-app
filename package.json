@@ -15,6 +15,7 @@
     "sass": "^1.32.8"
   },
   "dependencies": {
+    "chart.js": "^3.1.1",
     "mathjs": "^9.3.2",
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
