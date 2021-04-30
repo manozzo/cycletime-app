@@ -112500,7 +112500,7 @@ var stopwatch = new Stopwatch();
 _chart.Chart.register.apply(_chart.Chart, _toConsumableArray(_chart.registerables)); //I don't know why yet, but without this import the code will crash
 
 
-var momentDurationFormatSetup = require("moment-duration-format"); // var ctx = document.getElementById('myChart');
+require("moment-duration-format"); // var ctx = document.getElementById('myChart');
 // var myChart = new Chart(ctx, {
 //     type: 'bar',
 //     data: {
@@ -112771,7 +112771,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59462" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55767" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

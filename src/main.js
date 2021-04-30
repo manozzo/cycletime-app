@@ -1,3 +1,4 @@
+require("moment-duration-format");
 import { create, all, mean } from "mathjs";
 const math = create(all);
 const Stopwatch = require("statman-stopwatch");
@@ -5,10 +6,6 @@ const stopwatch = new Stopwatch();
 import moment from "moment";
 import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
-
-
-//I don't know why yet, but without this import the code will crash
-var momentDurationFormatSetup = require("moment-duration-format");
 
 
 // var ctx = document.getElementById('myChart');
